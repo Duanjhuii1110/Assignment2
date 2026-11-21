@@ -1,0 +1,133 @@
+/* 系统字体栈，不引外部字体，保证国内访问速度。暗色模式用 CSS 变量 + html[data-theme]。 */
+
+:root {
+  --bg: #ffffff;
+  --bg-soft: #f5f5f4;
+  --text: #1c1c1a;
+  --text-soft: #6b6b66;
+  --border: rgba(0, 0, 0, 0.12);
+  --accent: #185fa5;
+  --code-bg: #f5f5f4;
+}
+
+html[data-theme='dark'] {
+  --bg: #1a1a19;
+  --bg-soft: #242423;
+  --text: #e8e8e4;
+  --text-soft: #a3a39c;
+  --border: rgba(255, 255, 255, 0.14);
+  --accent: #85b7eb;
+  --code-bg: #242423;
+}
+
+/* 代码块双主题：Shiki 输出 light 内联，dark 值存在 CSS 变量里，切换时整体换色 */
+html[data-theme='dark'] .astro-code,
+html[data-theme='dark'] .astro-code span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  line-height: 1.75;
+  font-size: 16px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.site {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+article,
+.prose {
+  max-width: 68ch;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+.prose pre {
+  padding: 14px 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  background: var(--code-bg);
+}
+
+.prose code {
+  font-family: ui-monospace, SFMono-Regular, Consolas, 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.prose pre code {
+  background: none;
+  padding: 0;
+}
+
+.prose blockquote {
+  margin: 1em 0;
+  padding: 0 1em;
+  border-left: 3px solid var(--border);
+  color: var(--text-soft);
+}
+
+.prose table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.prose th,
+.prose td {
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.muted {
+  color: var(--text-soft);
+  font-size: 0.9em;
+}
+
+.tag-chip {
+  display: inline-block;
+  font-size: 0.82em;
+  color: var(--text-soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 10px;
+  margin-right: 6px;
+}
+
+.tag-chip:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  text-decoration: none;
+}

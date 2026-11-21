@@ -1,0 +1,12 @@
+# dependencies / build
+node_modules/
+dist/
+.astro/
+
+# system
+.DS_Store
+Thumbs.db
+
+# personal / temp
+.workbuddy/
+*.log

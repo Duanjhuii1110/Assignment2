@@ -1,0 +1,14 @@
+---
+import { getPublishedPosts } from '../lib/posts';
+import { SITE_DESCRIPTION } from '../consts';
+import PostList from '../components/PostList.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout>
+  <section style="padding:24px 0 8px">
+    <h1 style="margin:0">文章</h1>
+    <p class="muted" style="margin:6px 0 0">{SITE_DESCRIPTION}</p>
+  </section>
+  <PostList posts={await getPublishedPosts()} />
+</BaseLayout>

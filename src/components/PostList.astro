@@ -1,0 +1,29 @@
+---
+import { withBase } from '../lib/url';
+import { tagKey } from '../lib/posts';
+import { formatDate } from '../lib/posts';
+import type { Post } from '../lib/posts';
+
+interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+{posts.length === 0 && <p class="muted">还没有文章。用 <code>npm run new -- "标题"</code> 写第一篇。</p>}
+
+<ul style="list-style:none;margin:0;padding:0">
+  {posts.map((post) => (
+    <li style="padding:16px 0;border-bottom:1px solid var(--border)">
+      <a href={withBase(`/posts/${post.id}/`)} style="font-size:1.05em;font-weight:500">{post.data.title}</a>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:4px;flex-wrap:wrap">
+        <time class="muted" datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+        {post.data.tags.map((tag) => (
+          <a class="tag-chip" href={withBase(`/tags/${tagKey(tag)}/`)}>#{tag}</a>
+        ))}
+      </div>
+      {post.data.description && <p class="muted" style="margin:6px 0 0">{post.data.description}</p>}
+    </li>
+  ))}
+</ul>

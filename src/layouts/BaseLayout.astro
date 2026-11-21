@@ -1,0 +1,72 @@
+---
+import '../styles/global.css';
+import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, EMAIL } from '../consts';
+import { withBase } from '../lib/url';
+import Nav from '../components/Nav.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = SITE_DESCRIPTION } = Astro.props;
+const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : undefined;
+const ogImage = Astro.site
+  ? new URL(withBase('/og-default.jpg'), Astro.site).href
+  : undefined;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+    <link rel="alternate" type="application/rss+xml" title="RSS 订阅" href={withBase('/rss.xml')} />
+    {canonical && <link rel="canonical" href={canonical.href} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    {/* 首屏内联同步脚本：先读 localStorage 再渲染，防止暗色模式闪白 */}
+    <script is:inline>
+      (function () {
+        try {
+          var saved = localStorage.getItem('theme');
+          var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (dark) document.documentElement.dataset.theme = 'dark';
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <a href="#main" class="skip-link">跳到正文</a>
+    <div class="site">
+      <Nav />
+      <main id="main">
+        <slot />
+      </main>
+      <footer style="border-top:1px solid var(--border);margin-top:48px;padding:20px 0 32px;color:var(--text-soft);font-size:0.9em">
+        © {new Date().getFullYear()} {AUTHOR} · <a href={withBase('/rss.xml')}>RSS</a> · <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+      </footer>
+    </div>
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+  }
+  .skip-link:focus {
+    left: 8px;
+    top: 8px;
+    background: var(--bg);
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+</style>

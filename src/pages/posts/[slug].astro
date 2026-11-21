@@ -1,0 +1,37 @@
+---
+import { getPublishedPosts, renderPost, type Post } from '../../lib/posts';
+import { withBase } from '../../lib/url';
+import { formatDate, tagKey } from '../../lib/posts';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props as { post: Post };
+const { Content } = await renderPost(post);
+const all = await getPublishedPosts();
+const idx = all.findIndex((p) => p.id === post.id);
+const prev = idx > 0 ? all[idx - 1] : undefined;
+const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : undefined;
+---
+
+<BaseLayout title={post.data.title} description={post.data.description}>
+  <article class="prose" style="padding:24px 0">
+    <h1 style="margin:0 0 8px">{post.data.title}</h1>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:24px">
+      <time class="muted" datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+      {post.data.tags.map((tag) => (
+        <a class="tag-chip" href={withBase(`/tags/${tagKey(tag)}/`)}>#{tag}</a>
+      ))}
+    </div>
+    <Content />
+    <hr style="border:none;border-top:1px solid var(--border);margin:36px 0 16px" />
+    <nav style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      {prev && <a href={withBase(`/posts/${prev.id}/`)}>← 上一篇：{prev.data.title}</a>}
+      {next && <a href={withBase(`/posts/${next.id}/`)} style="margin-left:auto">下一篇：{next.data.title} →</a>}
+    </nav>
+    <p style="margin-top:16px"><a href={withBase('/')}>← 返回全部文章</a></p>
+  </article>
+</BaseLayout>

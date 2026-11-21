@@ -1,0 +1,18 @@
+---
+import { getPublishedPosts, collectTags, tagKey } from '../../lib/posts';
+import { withBase } from '../../lib/url';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="标签">
+  <section style="padding:24px 0 8px">
+    <h1 style="margin:0">标签</h1>
+  </section>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;padding:16px 0">
+    {(collectTags(await getPublishedPosts())).map(({ tag, count }) => (
+      <a class="tag-chip" href={withBase(`/tags/${tagKey(tag)}/`)} style="font-size:0.95em;padding:4px 14px">
+        #{tag} <span class="muted">{count}</span>
+      </a>
+    ))}
+  </div>
+</BaseLayout>

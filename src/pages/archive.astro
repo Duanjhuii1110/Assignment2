@@ -1,0 +1,34 @@
+---
+import { getPublishedPosts, formatDate, type Post } from '../lib/posts';
+import { withBase } from '../lib/url';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const posts = await getPublishedPosts();
+const byYear = new Map<number, Post[]>();
+for (const post of posts) {
+  const y = post.data.date.getFullYear();
+  if (!byYear.has(y)) byYear.set(y, []);
+  byYear.get(y)!.push(post);
+}
+const years = [...byYear.keys()].sort((a, b) => b - a);
+---
+
+<BaseLayout title="归档">
+  <section style="padding:24px 0 8px">
+    <h1 style="margin:0">归档</h1>
+    <p class="muted" style="margin:6px 0 0">共 {posts.length} 篇</p>
+  </section>
+  {years.map((year) => (
+    <section style="padding:16px 0">
+      <h2 style="font-size:1.1em;margin:0 0 4px">{year}</h2>
+      <ul style="list-style:none;margin:0;padding:0">
+        {byYear.get(year)!.map((post) => (
+          <li style="display:flex;gap:14px;padding:6px 0;align-items:baseline">
+            <span class="muted" style="flex-shrink:0">{formatDate(post.data.date).slice(5)}</span>
+            <a href={withBase(`/posts/${post.id}/`)}>{post.data.title}</a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</BaseLayout>
