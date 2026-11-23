@@ -4,7 +4,7 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://duanjhuii1110.github.io',
-  base: '/blog',
+  base: '/Assignment2',
   trailingSlash: 'ignore',
   build: {
     format: 'directory',
