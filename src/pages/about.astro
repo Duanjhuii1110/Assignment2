@@ -8,8 +8,21 @@ if (!page) throw new Error('未找到 src/content/pages/about.md');
 const { Content } = await render(page);
 ---
 
-<BaseLayout title={page.data.title}>
-  <article class="prose" style="padding:24px 0">
+<BaseLayout title={page.data.title} description="关于这本放映手册和它的作者。">
+  <article class="prose about">
+    <header class="page-head">
+      <p class="kicker">叁 · 关于</p>
+      <h1>{page.data.title}</h1>
+    </header>
+
+    <hr class="head-rule" />
+
     <Content />
   </article>
 </BaseLayout>
+
+<style>
+  .about {
+    max-width: 62ch;
+  }
+</style>

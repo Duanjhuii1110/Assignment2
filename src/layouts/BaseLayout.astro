@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, EMAIL } from '../consts';
+import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, EMAIL, ISSUE } from '../consts';
 import { withBase } from '../lib/url';
 import Nav from '../components/Nav.astro';
 
@@ -49,8 +49,19 @@ const ogImage = Astro.site
       <main id="main">
         <slot />
       </main>
-      <footer style="border-top:1px solid var(--border);margin-top:48px;padding:20px 0 32px;color:var(--text-soft);font-size:0.9em">
-        © {new Date().getFullYear()} {AUTHOR} · <a href={withBase('/rss.xml')}>RSS</a> · <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+
+      <footer class="colophon">
+        <p class="colophon-mark" aria-hidden="true">● ● ●</p>
+        <div class="colophon-row">
+          <p class="colophon-line">© {new Date().getFullYear()} {AUTHOR} · 放映手册 · {ISSUE}</p>
+          <p class="colophon-line colophon-links">
+            <a href={withBase('/rss.xml')}>RSS</a>
+            <span class="sep" aria-hidden="true">/</span>
+            <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+            <span class="sep" aria-hidden="true">/</span>
+            <button id="theme-toggle" class="theme-btn" type="button" aria-label="切换明暗主题">夜场</button>
+          </p>
+        </div>
       </footer>
     </div>
   </body>
@@ -60,13 +71,107 @@ const ogImage = Astro.site
   .skip-link {
     position: absolute;
     left: -9999px;
+    z-index: 20;
   }
+
   .skip-link:focus {
-    left: 8px;
-    top: 8px;
-    background: var(--bg);
+    left: 12px;
+    top: 12px;
     padding: 6px 12px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
+    background: var(--paper);
+    border: 1px solid var(--rule-strong);
+  }
+
+  .colophon {
+    margin-top: 58px;
+    padding: 0 0 40px;
+    color: var(--ink-soft);
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+  }
+
+  .colophon-mark {
+    margin: 0 0 16px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule);
+    text-align: center;
+    font-size: 0.5rem;
+    letter-spacing: 0.7em;
+    color: var(--red);
+  }
+
+  .colophon-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+  }
+
+  .colophon-line {
+    margin: 0;
+  }
+
+  .colophon-links {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .colophon a {
+    border-bottom: 1px solid transparent;
+  }
+
+  .colophon a:hover {
+    color: var(--red);
+    border-bottom-color: var(--red);
+  }
+
+  .sep {
+    color: var(--rule-strong);
+  }
+
+  .theme-btn {
+    padding: 0;
+    border: none;
+    border-bottom: 1px solid transparent;
+    background: none;
+    color: inherit;
+    font: inherit;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+  }
+
+  .theme-btn:hover {
+    color: var(--red);
+    border-bottom-color: var(--red);
   }
 </style>
+
+<script>
+  function setupTheme() {
+    const btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    const sync = () => {
+      const dark = document.documentElement.dataset.theme === 'dark';
+      btn.textContent = dark ? '日场' : '夜场';
+      btn.setAttribute(
+        'aria-label',
+        dark ? '切换到日场（浅色模式）' : '切换到夜场（深色模式）'
+      );
+    };
+    sync();
+    btn.addEventListener('click', () => {
+      const dark = document.documentElement.dataset.theme === 'dark';
+      if (dark) delete document.documentElement.dataset.theme;
+      else document.documentElement.dataset.theme = 'dark';
+      try {
+        localStorage.setItem('theme', dark ? 'light' : 'dark');
+      } catch (e) {}
+      sync();
+    });
+  }
+  setupTheme();
+  document.addEventListener('astro:after-swap', setupTheme);
+</script>

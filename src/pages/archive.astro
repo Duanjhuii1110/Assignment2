@@ -13,22 +13,129 @@ for (const post of posts) {
 const years = [...byYear.keys()].sort((a, b) => b - a);
 ---
 
-<BaseLayout title="归档">
-  <section style="padding:24px 0 8px">
-    <h1 style="margin:0">归档</h1>
-    <p class="muted" style="margin:6px 0 0">共 {posts.length} 篇</p>
-  </section>
+<BaseLayout title="档案">
+  <header class="page-head">
+    <p class="kicker">肆 · 档案</p>
+    <h1>档案</h1>
+    <p class="page-sub">
+      按时间倒序，共 {posts.length} 篇 · <a class="sub-link" href={withBase('/tags/')}>按标签浏览</a>
+    </p>
+  </header>
+
+  <hr class="head-rule" />
+
   {years.map((year) => (
-    <section style="padding:16px 0">
-      <h2 style="font-size:1.1em;margin:0 0 4px">{year}</h2>
-      <ul style="list-style:none;margin:0;padding:0">
+    <section class="year-block">
+      <h2 class="year-head">
+        <span class="year-no">{year}</span>
+        <span class="year-count">{byYear.get(year)!.length} 篇</span>
+      </h2>
+      <ul class="archive-list">
         {byYear.get(year)!.map((post) => (
-          <li style="display:flex;gap:14px;padding:6px 0;align-items:baseline">
-            <span class="muted" style="flex-shrink:0">{formatDate(post.data.date).slice(5)}</span>
-            <a href={withBase(`/posts/${post.id}/`)}>{post.data.title}</a>
+          <li>
+            <a class="archive-row" href={withBase(`/posts/${post.id}/`)}>
+              <span class="archive-date">{formatDate(post.data.date).slice(5)}</span>
+              <span class="archive-title">{post.data.title}</span>
+              <span class="archive-leader" aria-hidden="true"></span>
+              <span class="archive-arrow" aria-hidden="true">→</span>
+            </a>
           </li>
         ))}
       </ul>
     </section>
   ))}
 </BaseLayout>
+
+<style>
+  .sub-link {
+    color: var(--red);
+    border-bottom: 1px solid rgba(174, 43, 31, 0.3);
+  }
+
+  .sub-link:hover {
+    border-bottom-color: var(--red);
+    text-decoration: none;
+  }
+
+  .year-block {
+    margin-bottom: 34px;
+  }
+
+  .year-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin: 0 0 6px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--rule-strong);
+  }
+
+  .year-no {
+    font-family: var(--font-serif);
+    font-size: 1.6rem;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+
+  .year-count {
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+  }
+
+  .archive-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .archive-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .archive-row:hover {
+    color: var(--red);
+  }
+
+  .archive-date {
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+  }
+
+  .archive-title {
+    font-family: var(--font-serif);
+    font-size: 1.04rem;
+    line-height: 1.5;
+  }
+
+  .archive-leader {
+    flex: 1;
+    height: 1px;
+    min-width: 18px;
+    border-bottom: 1px dotted var(--rule-strong);
+    transform: translateY(-3px);
+  }
+
+  .archive-arrow {
+    flex-shrink: 0;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+  }
+
+  .archive-row:hover .archive-arrow {
+    color: var(--red);
+  }
+
+  @media (max-width: 620px) {
+    .archive-title {
+      font-size: 0.98rem;
+    }
+  }
+</style>

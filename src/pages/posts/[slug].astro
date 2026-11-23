@@ -15,23 +15,71 @@ const all = await getPublishedPosts();
 const idx = all.findIndex((p) => p.id === post.id);
 const prev = idx > 0 ? all[idx - 1] : undefined;
 const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : undefined;
+
+const chars = (post.body ?? '').replace(/\s/g, '').length;
+const minutes = Math.max(1, Math.round(chars / 400));
 ---
 
 <BaseLayout title={post.data.title} description={post.data.description}>
-  <article class="prose" style="padding:24px 0">
-    <h1 style="margin:0 0 8px">{post.data.title}</h1>
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:24px">
-      <time class="muted" datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
-      {post.data.tags.map((tag) => (
-        <a class="tag-chip" href={withBase(`/tags/${tagKey(tag)}/`)}>#{tag}</a>
-      ))}
-    </div>
+  <article class="prose">
+    <header class="post-head">
+      <p class="kicker">放映手册 · 内页</p>
+      <h1>{post.data.title}</h1>
+      <div class="post-meta">
+        <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+        <span aria-hidden="true">/</span>
+        <span>约 {minutes} 分钟</span>
+        {post.data.tags.map((tag) => (
+          <a class="tag-chip" href={withBase(`/tags/${tagKey(tag)}/`)}>#{tag}</a>
+        ))}
+      </div>
+    </header>
+
+    <hr class="head-rule" />
+
     <Content />
-    <hr style="border:none;border-top:1px solid var(--border);margin:36px 0 16px" />
-    <nav style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
-      {prev && <a href={withBase(`/posts/${prev.id}/`)}>← 上一篇：{prev.data.title}</a>}
-      {next && <a href={withBase(`/posts/${next.id}/`)} style="margin-left:auto">下一篇：{next.data.title} →</a>}
+
+    <p class="end-mark" aria-hidden="true">— 完 —</p>
+
+    <nav class="post-nav" aria-label="文章导航">
+      {prev && <a href={withBase(`/posts/${prev.id}/`)}>← {prev.data.title}</a>}
+      {next && <a class="next" href={withBase(`/posts/${next.id}/`)}>{next.data.title} →</a>}
     </nav>
-    <p style="margin-top:16px"><a href={withBase('/')}>← 返回全部文章</a></p>
+
+    <a class="back-link" href={withBase('/')}>← 回到目录</a>
   </article>
 </BaseLayout>
+
+<style>
+  .post-head {
+    padding: 34px 0 0;
+  }
+
+  .post-head h1 {
+    margin: 0 0 12px;
+    font-size: clamp(1.9rem, 4.8vw, 2.7rem);
+    line-height: 1.32;
+  }
+
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+  }
+
+  .head-rule {
+    margin: 20px 0 30px;
+    border: none;
+    border-top: 1px solid var(--rule);
+  }
+
+  @media (max-width: 620px) {
+    .post-head {
+      padding-top: 26px;
+    }
+  }
+</style>

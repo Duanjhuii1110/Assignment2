@@ -2,6 +2,7 @@
 import { getPublishedPosts, collectTags, tagKey, type Post } from '../../lib/posts';
 import PostList from '../../components/PostList.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { withBase } from '../../lib/url';
 
 export async function getStaticPaths() {
   const posts = await getPublishedPosts();
@@ -18,9 +19,25 @@ const { display, posts } = Astro.props as { display: string; posts: Post[] };
 ---
 
 <BaseLayout title={`标签：${display}`}>
-  <section style="padding:24px 0 8px">
-    <h1 style="margin:0">#{display}</h1>
-    <p class="muted" style="margin:6px 0 0">共 {posts.length} 篇</p>
-  </section>
+  <header class="page-head">
+    <p class="kicker">档案 · 标签</p>
+    <h1>#{display}</h1>
+    <p class="page-sub">共 {posts.length} 篇 · <a class="sub-link" href={withBase('/tags/')}>全部标签</a></p>
+  </header>
+
+  <hr class="head-rule" />
+
   <PostList posts={posts} />
 </BaseLayout>
+
+<style>
+  .sub-link {
+    color: var(--red);
+    border-bottom: 1px solid rgba(174, 43, 31, 0.3);
+  }
+
+  .sub-link:hover {
+    border-bottom-color: var(--red);
+    text-decoration: none;
+  }
+</style>
