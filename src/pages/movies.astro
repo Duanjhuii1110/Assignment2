@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { MOVIES } from '../data/movies';
+
+const total = MOVIES.length;
+
+function stars(rating: number | null) {
+  if (rating === null) return null;
+  return '★'.repeat(Math.max(0, Math.min(5, rating)));
+}
+---
+
+<BaseLayout title="观影" description="看过的电影和剧，纯记录，不写影评。">
+  <section style="padding:24px 0 8px">
+    <h1 style="margin:0">观影</h1>
+    <p class="muted" style="margin:6px 0 0">共 {total} 部 · 看过就记一笔，不写长篇</p>
+  </section>
+
+  <ul style="list-style:none;margin:0;padding:0">
+    {MOVIES.map((m) => (
+      <li style="display:flex;gap:12px;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--border);flex-wrap:wrap">
+        <span style="font-weight:600">{m.title}</span>
+        <span class="tag-chip" style="margin:0">{m.kind}</span>
+        <span class="muted">{m.year}</span>
+        <span style="margin-left:auto;letter-spacing:1px" aria-label={m.rating ? `${m.rating} 星` : '未评分'}>
+          {stars(m.rating) !== null ? (
+            <>
+              <span style="color:var(--accent)">{stars(m.rating)}</span>
+              <span class="muted">{'★'.repeat(5 - (m.rating ?? 0))}</span>
+            </>
+          ) : (
+            <span class="muted">未评分</span>
+          )}
+        </span>
+        {m.note && <p class="muted" style="width:100%;margin:2px 0 0">{m.note}</p>}
+      </li>
+    ))}
+  </ul>
+
+  <p class="muted" style="padding:20px 0 0">这部清单慢慢补，看完一部加一行。</p>
+</BaseLayout>
