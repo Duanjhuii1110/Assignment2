@@ -40,8 +40,18 @@ const articleNav = NAV[0];
 </BaseLayout>
 
 <style>
+  /* 封面占满第一屏：减去刊头高度，标题在剩余空间里垂直居中，票根落在首屏底部 */
   .hero {
-    padding: 42px 0 6px;
+    min-height: calc(100vh - 178px);
+    min-height: calc(100svh - 178px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 34px 0 30px;
+  }
+
+  .hero .kicker {
+    margin-bottom: 1.1em;
   }
 
   .hero h1 {
@@ -157,7 +167,9 @@ const articleNav = NAV[0];
 
   @media (max-width: 620px) {
     .hero {
-      padding-top: 30px;
+      min-height: calc(100vh - 158px);
+      min-height: calc(100svh - 158px);
+      padding: 26px 0 24px;
     }
 
     .hero-lead {
