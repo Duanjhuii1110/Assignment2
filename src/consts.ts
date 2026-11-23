@@ -3,7 +3,7 @@
 export const SITE_TITLE = 'Duanjhuii1110 的博客';
 export const SITE_DESCRIPTION = '记录学习、想法与生活的地方。';
 export const AUTHOR = 'Duanjhuii1110';
-export const EMAIL = 'duanj@qq.com'; // TODO: 换成你自己的邮箱
+export const EMAIL = '786206703@qq.com';
 
 export const NAV = [
   { label: '文章', href: '/' },
