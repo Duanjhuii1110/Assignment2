@@ -1,41 +1,287 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { MOVIES } from '../data/movies';
-
-const total = MOVIES.length;
-
-function stars(rating: number | null) {
-  if (rating === null) return null;
-  return '★'.repeat(Math.max(0, Math.min(5, rating)));
-}
 ---
 
-<BaseLayout title="观影" description="看过的电影和剧，纯记录，不写影评。">
-  <section style="padding:24px 0 8px">
+<BaseLayout title="观影" description="看过的电影和剧，点开卡片看解说。">
+  <section style="padding:24px 0 4px">
     <h1 style="margin:0">观影</h1>
-    <p class="muted" style="margin:6px 0 0">共 {total} 部 · 看过就记一笔，不写长篇</p>
+    <p class="muted" style="margin:6px 0 0">共 {MOVIES.length} 部 · 点卡片展开解说，也可以用方向键</p>
   </section>
 
-  <ul style="list-style:none;margin:0;padding:0">
-    {MOVIES.map((m) => (
-      <li style="display:flex;gap:12px;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--border);flex-wrap:wrap">
-        <span style="font-weight:600">{m.title}</span>
-        <span class="tag-chip" style="margin:0">{m.kind}</span>
-        <span class="muted">{m.year}</span>
-        <span style="margin-left:auto;letter-spacing:1px" aria-label={m.rating ? `${m.rating} 星` : '未评分'}>
-          {stars(m.rating) !== null ? (
-            <>
-              <span style="color:var(--accent)">{stars(m.rating)}</span>
-              <span class="muted">{'★'.repeat(5 - (m.rating ?? 0))}</span>
-            </>
-          ) : (
-            <span class="muted">未评分</span>
-          )}
-        </span>
-        {m.note && <p class="muted" style="width:100%;margin:2px 0 0">{m.note}</p>}
-      </li>
+  <div class="cf" id="cf" tabindex="0" role="group" aria-label="观影卡片墙，左右方向键切换，回车展开解说">
+    {MOVIES.map((m, i) => (
+      <button
+        class="cf-card"
+        type="button"
+        data-i={i}
+        aria-pressed={i === 0 ? 'true' : 'false'}
+        aria-label={`${m.title}，${m.kind}，${m.year} 年`}
+        style={`--bg:${m.bg};--fg:${m.fg};--bgd:${m.bgDark};--fgd:${m.fgDark}`}
+      >
+        <span class="cf-kind">{m.kind} · {m.year}</span>
+        <span class="cf-title">{m.title}</span>
+      </button>
     ))}
-  </ul>
+  </div>
 
-  <p class="muted" style="padding:20px 0 0">这部清单慢慢补，看完一部加一行。</p>
+  <div class="cf-ctrl">
+    <button id="cf-prev" type="button" aria-label="上一部">‹</button>
+    <span class="muted" id="cf-pos" style="min-width:56px;text-align:center">1 / {MOVIES.length}</span>
+    <button id="cf-next" type="button" aria-label="下一部">›</button>
+  </div>
+
+  <section class="cf-detail" id="cf-detail" aria-live="polite">
+    {MOVIES.map((m, i) => (
+      <article class="cf-panel" data-i={i} hidden={i !== 0}>
+        <h2 class="cf-panel-title">{m.title}</h2>
+        <p class="muted" style="margin:0 0 12px">{m.kind} · {m.year} 年</p>
+        <p class="cf-desc">{m.desc}</p>
+      </article>
+    ))}
+  </section>
+
+  <p class="muted" style="padding:8px 0 0">看完一部就补一段，慢慢攒成自己的片单。</p>
 </BaseLayout>
+
+<script type="application/json" id="cf-data" set:html={JSON.stringify(MOVIES)}></script>
+
+<style is:global>
+  .cf {
+    position: relative;
+    height: 300px;
+    margin-top: 12px;
+    perspective: 1100px;
+    perspective-origin: 50% 45%;
+    user-select: none;
+    touch-action: pan-y;
+    outline: none;
+  }
+
+  .cf:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 6px;
+    border-radius: 12px;
+  }
+
+  .cf-card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 170px;
+    height: 240px;
+    margin: -120px 0 0 -85px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: left;
+    font-family: inherit;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg);
+    color: var(--fg);
+    cursor: pointer;
+    overflow: hidden;
+    will-change: transform;
+    transition:
+      transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
+      opacity 0.4s ease,
+      box-shadow 0.35s ease;
+  }
+
+  html[data-theme='dark'] .cf-card {
+    background: var(--bgd);
+    color: var(--fgd);
+  }
+
+  .cf-card[aria-pressed='true'] {
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.16);
+  }
+
+  html[data-theme='dark'] .cf-card[aria-pressed='true'] {
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
+  }
+
+  .cf-card:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+
+  .cf-kind {
+    font-size: 0.74em;
+    letter-spacing: 0.08em;
+    opacity: 0.7;
+  }
+
+  .cf-title {
+    font-size: 1.4em;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: 0.02em;
+  }
+
+  .cf-ctrl {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 2px 0 6px;
+  }
+
+  .cf-ctrl button {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--text);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .cf-ctrl button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .cf-detail {
+    padding: 14px 0 4px;
+  }
+
+  .cf-panel {
+    animation: cf-in 0.35s ease both;
+  }
+
+  .cf-panel[hidden] {
+    display: none;
+  }
+
+  .cf-panel-title {
+    margin: 0 0 2px;
+    font-size: 1.3em;
+  }
+
+  .cf-desc {
+    margin: 0;
+    line-height: 1.85;
+    max-width: 60ch;
+  }
+
+  @keyframes cf-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .cf {
+      height: 250px;
+      perspective: 800px;
+    }
+
+    .cf-card {
+      width: 132px;
+      height: 188px;
+      margin: -94px 0 0 -66px;
+      padding: 12px;
+      border-radius: 10px;
+    }
+
+    .cf-title {
+      font-size: 1.15em;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cf-card {
+      transition: none;
+    }
+
+    .cf-panel {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  const raw = document.getElementById('cf-data');
+  const data = raw ? JSON.parse(raw.textContent || '[]') : [];
+  const stage = document.getElementById('cf');
+  const posEl = document.getElementById('cf-pos');
+
+  if (stage && data.length > 0) {
+    const cards = Array.from(stage.querySelectorAll<HTMLButtonElement>('.cf-card'));
+    const panels = Array.from(document.querySelectorAll<HTMLElement>('.cf-panel'));
+    const prevBtn = document.getElementById('cf-prev');
+    const nextBtn = document.getElementById('cf-next');
+    let active = 0;
+
+    const layout = () => {
+      const narrow = stage.clientWidth < 560;
+      const step = narrow ? 64 : 108;
+      cards.forEach((card, i) => {
+        const off = i - active;
+        const abs = Math.abs(off);
+        const x = off * step;
+        const ry = Math.max(-55, Math.min(55, -off * 26));
+        const sc = Math.max(0.7, 1 - abs * 0.08);
+        const op = abs > 2 ? 0 : 1 - Math.min(abs * 0.15, 0.32);
+        card.style.transform = `translateX(${x}px) rotateY(${ry}deg) scale(${sc})`;
+        card.style.zIndex = String(20 - abs);
+        card.style.opacity = String(op);
+        card.style.pointerEvents = op === 0 ? 'none' : 'auto';
+        card.setAttribute('aria-pressed', i === active ? 'true' : 'false');
+      });
+      panels.forEach((p, i) => {
+        p.hidden = i !== active;
+      });
+      if (posEl) posEl.textContent = `${active + 1} / ${data.length}`;
+    };
+
+    const go = (i: number) => {
+      active = (i + data.length) % data.length;
+      layout();
+    };
+
+    cards.forEach((card, i) => card.addEventListener('click', () => go(i)));
+    prevBtn?.addEventListener('click', () => go(active - 1));
+    nextBtn?.addEventListener('click', () => go(active + 1));
+
+    stage.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        go(active - 1);
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        go(active + 1);
+      }
+    });
+
+    let startX: number | null = null;
+    stage.addEventListener('pointerdown', (e: PointerEvent) => {
+      startX = e.clientX;
+    });
+    stage.addEventListener('pointerup', (e: PointerEvent) => {
+      if (startX === null) return;
+      const dx = e.clientX - startX;
+      startX = null;
+      if (Math.abs(dx) > 45) go(active + (dx < 0 ? 1 : -1));
+    });
+
+    let resizeTimer: number | undefined;
+    window.addEventListener('resize', () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(layout, 120);
+    });
+
+    layout();
+  }
+</script>
