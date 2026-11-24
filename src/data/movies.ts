@@ -6,6 +6,7 @@ export type Movie = {
   title: string;
   kind: '电影' | '剧集';
   year: string;
+  poster: string;
   bg: string;
   fg: string;
   bgDark: string;
@@ -16,6 +17,7 @@ export type Movie = {
 export const MOVIES: Movie[] = [
   {
     title: '星际穿越',
+    poster: '/movies/interstellar.jpg',
     kind: '电影',
     year: '2014',
     bg: '#E6F1FB',
@@ -26,6 +28,7 @@ export const MOVIES: Movie[] = [
   },
   {
     title: '怪奇物语',
+    poster: '/movies/stranger.jpg',
     kind: '剧集',
     year: '2016',
     bg: '#FCEBEB',
@@ -36,6 +39,7 @@ export const MOVIES: Movie[] = [
   },
   {
     title: '星期三',
+    poster: '/movies/wednesday.jpg',
     kind: '剧集',
     year: '2022',
     bg: '#EEEDFE',
@@ -46,6 +50,7 @@ export const MOVIES: Movie[] = [
   },
   {
     title: '第二十条',
+    poster: '/movies/law.jpg',
     kind: '电影',
     year: '2024',
     bg: '#FAEEDA',
@@ -56,6 +61,7 @@ export const MOVIES: Movie[] = [
   },
   {
     title: '镖人',
+    poster: '/movies/biao.jpg',
     kind: '电影',
     year: '2026',
     bg: '#FAECE7',
@@ -66,6 +72,7 @@ export const MOVIES: Movie[] = [
   },
   {
     title: '惊蛰无声',
+    poster: '/movies/spy.jpg',
     kind: '电影',
     year: '2025',
     bg: '#E1F5EE',
